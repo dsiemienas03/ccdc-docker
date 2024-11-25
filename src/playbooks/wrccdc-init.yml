@@ -1,0 +1,22 @@
+---
+- name: Firewall rules
+  hosts: wrccdc_fw
+  # connection: local
+  ignore_errors: true
+  tasks:
+    - name: Import vars
+      ansible.builtin.include_vars:
+        dir: ~/data/vars/
+
+    - name: Set base FW rules
+      ansible.builtin.import_role:
+        name: dsu.ccdc.wasabi_wall
+        tasks_from: wasabi_base
+
+    - name: Set service FW rules
+      ansible.builtin.include_role:
+        name: dsu.ccdc.wasabi_wall
+        tasks_from: wasabi_svc
+      loop: "{{ services.wrccdc_fw | dict2items }}"
+      loop_control:
+        loop_var: service
