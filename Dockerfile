@@ -42,12 +42,12 @@ RUN set -ex ;\
 
 RUN ansible-galaxy collection install -r config/requirements.yml
 
-COPY --chown=ansible:ansible dsu/ ./dsu/
+ADD --chown=ansible:ansible https://github.com/dsiemienas03/ccdc-ansible.git .
 
 RUN set -ex ;\
     ansible-galaxy collection build dsu/ccdc/ ;\
     ansible-galaxy collection install --offline dsu-ccdc-1.0.0.tar.gz ;\
-    rm -rf dsu-ccdc-1.0.0.tar.gz
+    rm -rf dsu-ccdc-1.0.0.tar.gz .github .config
 
 COPY --chown=ansible:ansible src/ ./
 ENTRYPOINT ["top", "-b"]
