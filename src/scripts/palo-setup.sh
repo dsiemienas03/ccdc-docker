@@ -17,14 +17,10 @@ cat >> data/inv.yml <<EOF
 palo:
   hosts:
     ${palo_ip}:
-  vars:
-    ip_address: ${palo_ip}
-    api_key: ${api_key}
-    fw: palo1
-
+      ip_address: ${palo_ip}
+      api_key: ${api_key}
+      #lan_net:
+      #local_dns:
 EOF
 
-cat ~/.ssh/id_rsa.pub
-cat data/inv.yml
-
-# sudo ansible-vault encrypt inv.yml
+cat ~/data/inv.yml

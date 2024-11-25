@@ -37,7 +37,7 @@
           Update OS: "{{ palo_update_os }}"
           Update Other: "{{ palo_update_other }}"
           PANOS Version: "{{ palo_panos_version }}"
-          FW Net: "{{ fw_mask }}"
+          FW Net: "{{ lan_net }}"
           Wazuh: "{{ wazuh }}"
           Wazuh Port: "{{ wazuh_port }}"
 
@@ -49,8 +49,17 @@
           Logging: "{{ palo_config_logging }}"
           Initial Rules: "{{ palo_config_initial_rules }}"
           Initial Zones: "{{ palo_config_initial_zones }}"
+
     - name: Confirm config
       ansible.builtin.pause:
+
+    - name: Set dns and panorama
+      paloaltonetworks.panos.panos_mgtconfig:
+        provider: "{{ provider }}"
+        device_group: "{{ device_group if device_group is defined else omit }}"
+        dns_server_primary: "{{ local_dns }}"
+        dns_server_secondary: "{{ white_dns }}"
+        ntp_server_primary: "{{ white_ntp }}"
 
     # Updates
     - name: Palo OS Update
@@ -142,6 +151,7 @@
     - name: Wait for System Information
       paloaltonetworks.panos.panos_op:
         provider: "{{ provider }}"
+        device_group: "{{ device_group if device_group is defined else omit }}"
         cmd: show system info
       register: system_info
       until: system_info is not failed

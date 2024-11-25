@@ -1,7 +1,4 @@
 ---
-# vars file for ccdc
-team_num: 60
-
 # Whiteteam IPs
 mask_white: 10.120.0.0/24
 ntp_white: 10.120.0.10
@@ -11,10 +8,11 @@ proxy_white: 10.120.0.200
 # phone_white: 10.120.0.100
 
 # Critical IPs
-wazuh: 1.1.1.1
-wazuh_port: 1516
-wazuh_protocol: TCP
+# wazuh: 1.1.1.1
+# wazuh_port: 1516
+# wazuh_protocol: TCP
 
 # Remote IPS
-remote_ip: 172.16.1.
-remote_net: 172.16.1.0/24
+# remote_ip: 172.16.1.
+remote_net:
+  - 172.16.1.0/24

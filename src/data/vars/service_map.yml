@@ -18,9 +18,12 @@ palo:
       - pop3
     smtp:
       - smtp
+    imap:
+      - imap
     http:
       - web-browsing
     email:
+      - imap
       - pop3
       - smtp
     git:
@@ -35,6 +38,8 @@ wrccdc_fw:
       port: 22
     http:
       port: 80
+    https:
+      port: 443
     smb:
       port: 445
     ftp:
