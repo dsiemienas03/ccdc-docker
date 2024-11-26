@@ -8,7 +8,7 @@ RUN set -ex ;\
     apt-utils ;\
     \
     apt-get install -y --no-install-recommends \ 
-    ansible=9.2.0 \
+    ansible \
     curl \
     git \
     python3 \
