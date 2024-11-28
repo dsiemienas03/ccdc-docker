@@ -28,6 +28,10 @@ palo:
       - smtp
     git:
       - git
+    db:
+      - mysql
+      - postgres
+      - mongodb
 
 cisco:
   svc:
