@@ -1,4 +1,5 @@
-- name: Palo
+---
+- name: Palo initial config
   hosts: palo
   connection: local
   ignore_errors: true
@@ -9,56 +10,25 @@
       ip_address: "{{ inventory_hostname }}"
       api_key: "{{ api_key }}"
 
-
   tasks:
     - name: Include role
       ansible.builtin.include_role:
         name: dsu.ccdc.palo
         vars_from: main.yml
 
-    - name: Include IP vars
+    - name: Load vars
       ansible.builtin.include_vars:
         dir: ~/data/vars/
-    # - name: Show Facts
-    #   ansible.builtin.debug:
-    #     var: "{{update_os}}, {{logging}}"
 
-    # - name: Pause until for commit verification
-    #   ansible.builtin.pause:
-    - name: Print configs
-      ansible.builtin.debug:
-        msg:
-          Update OS: "{{ palo_update_os }}"
-          Update Other: "{{ palo_update_other }}"
-          Initial Interface: "{{ palo_config_initial_interface }}"
-          Initial Groups: "{{ palo_config_initial_groups }}"
-          Logging: "{{ palo_config_logging }}"
-          Initial Rules: "{{ palo_config_initial_rules }}"
-          PANOS Version: "{{ palo_panos_version }}"
-          Wazuh: "{{ wazuh }}"
-          Wazuh Port: "{{ wazuh_port }}"
-          Remote Networks: "{{ remote_net }}"
-
-    - name: Tags
+    # Firewall rules
+    - name: Add CCDC local firewall rules
       ansible.builtin.import_role:
         name: dsu.ccdc.palo
-        tasks_from: tags
-
-    - name: Show IPs
-      ansible.builtin.debug:
-        msg:
-          Phone White: "{{ phone_white }}"
-          CCS White: "{{ ccs_white }}"
-          Proxy White: "{{ proxy_white }}"
-          Mask White: "{{ mask_white }}"
-    - name: Confirm config
-      ansible.builtin.pause:
-
-    - name: Add CCDC rules
+        tasks_from: palo_local
+    - name: Add CCDC service firewall rules
       ansible.builtin.import_role:
         name: dsu.ccdc.palo
-        tasks_from: palo_ccdc
-
+        tasks_from: palo_service
   handlers:
     - name: Wait for System Information
       paloaltonetworks.panos.panos_op:

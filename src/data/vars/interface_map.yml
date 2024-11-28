@@ -1,53 +1,54 @@
 ---
-palo:
+palo_zone:
   zones:
     ethernet1/1:
       zone: wan
     ethernet1/2:
       zone: lan
     # ethernet1/3:
-      # zone:
+    # zone:
     # ethernet1/4:
-      # zone:
+    # zone:
     # ethernet1/5:
-      # zone:
+    # zone:
     # ethernet1/6:
-      # zone:
+    # zone:
     # ethernet1/7:
-      # zone:
+    # zone:
     ethernet1/8:
       zone: mgt
     # ethernet1/9:
-      # zone:
+    # zone:
     # ethernet1/10:
-      # zone:
+    # zone:
     # ethernet1/11:
-      # zone:
+    # zone:
     # ethernet1/12:
-      # zone:
-cisco:
+    # zone:
+
+cisco_zone:
   zones:
     ethernet1/1:
       zone: wan
     ethernet1/2:
       zone: lan
     # ethernet1/3:
-      # zone:
+    # zone:
     # ethernet1/4:
-      # zone:
+    # zone:
     # ethernet1/5:
-      # zone:
+    # zone:
     # ethernet1/6:
-      # zone:
+    # zone:
     # ethernet1/7:
-      # zone:
+    # zone:
     # ethernet1/8:
-      # zone:
+    # zone:
     # ethernet1/9:
-      # zone:
+    # zone:
     # ethernet1/10:
-      # zone:
+    # zone:
     # ethernet1/11:
-      # zone:
+    # zone:
     # ethernet1/12:
-      # zone:
+    # zone:
