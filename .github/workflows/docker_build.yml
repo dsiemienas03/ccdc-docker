@@ -111,6 +111,7 @@ jobs:
         uses: docker/build-push-action@v6.10.0
         with:
           context: .
+          push: true
           tags: ${{ steps.meta2.outputs.tags }}
           labels: ${{ steps.meta2.outputs.labels }}
           cache-from: type=gha
