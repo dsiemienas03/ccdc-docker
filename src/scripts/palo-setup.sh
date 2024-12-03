@@ -1,9 +1,6 @@
 #!/usr/bin/env bash 
 read -p "Palo IP: " palo_ip
 read -p "Palo PW: " palo_pw
-read -p "Cisco FTD IP: " ftd_ip
-read -p "Cisco FMC IP: " fmc_ip
-read -p "Cisco PW: " cisco_pw
 
 
 # ssh-keygen -t rsa -b 4096 -C "ansible@localhost" -f ~/.ssh/id_rsa -N ""
@@ -17,14 +14,10 @@ cat >> data/inv.yml <<EOF
 palo:
   hosts:
     ${palo_ip}:
-  vars:
-    ip_address: ${palo_ip}
-    api_key: ${api_key}
-    fw: palo1
-
+      ip_address: ${palo_ip}
+      api_key: ${api_key}
+      #lan_net:
+      #local_dns:
 EOF
 
-cat ~/.ssh/id_rsa.pub
-cat data/inv.yml
-
-# sudo ansible-vault encrypt inv.yml
+cat ~/data/inv.yml

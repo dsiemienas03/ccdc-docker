@@ -21,16 +21,6 @@ RUN useradd ansible -ms /bin/bash
 
 WORKDIR /home/ansible
 USER ansible
-RUN set -ex ;\
-    mkdir config ;\
-    mkdir data ;\
-    mkdir dsu ;\
-    mkdir playbooks ;\
-    mkdir .ssh ;\
-    chmod 700 data ;\
-    chmod 700 .ssh ;\
-    chown ansible:ansible data ;\
-    chown ansible:ansible .ssh
 
 COPY --chown=ansible:ansible config/ ./config
 
