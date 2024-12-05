@@ -109,7 +109,6 @@ jobs:
       - name: Build and push Docker image to Docker Hub
         id: build-and-push-docker
         uses: docker/build-push-action@v6.10.0
-        if: github.event != release
         with:
           context: .
           push: true
