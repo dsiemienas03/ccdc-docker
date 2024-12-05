@@ -16,4 +16,5 @@ wazuh_protocol: TCP
 
 # Remote IPS
 # remote_ip: 172.16.1.
-remote_net: 172.16.1.0/24
+remote_net: 
+  - 172.16.1.0/24
