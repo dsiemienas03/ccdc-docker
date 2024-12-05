@@ -1,6 +1,5 @@
 FROM ubuntu:oracular-20241009
 
-
 RUN set -ex ;\
     apt-get update ;\
     apt-get install -y --no-install-recommends \
@@ -12,29 +11,9 @@ RUN set -ex ;\
     python3 \
     python3-setuptools \
     python3-pip \
-    software-properties-common \
     vim \
     tmux ;\
     rm -rf /var/lib/apt/lists/*
-
-# wget -O- https://apt.releases.hashicorp.com/gpg | \
-# gpg --dearmor | \
-# sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg > /dev/null ;\
-# gpg --no-default-keyring \
-# --keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg \
-# --fingerprint ;\
-RUN \
-    lsb-release -cs ;\
-    echo "deb \
-    https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
-    sudo tee /etc/apt/sources.list.d/hashicorp.list ;\
-    sudo apt-get update ;\
-    sudo apt-get install -y \
-    terraform ;\
-    rm -rf /var/lib/apt/lists/*
-
-
-
 
 # Add user
 RUN useradd ansible -ms /bin/bash
