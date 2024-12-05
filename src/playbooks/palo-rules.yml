@@ -18,17 +18,35 @@
 
     - name: Load vars
       ansible.builtin.include_vars:
-        dir: ~/data/vars/
+        dir: /home/ansible/data/vars/
+
+    - name: Config zones
+      ansible.builtin.import_role:
+        name: dsu.ccdc.palo
+        tasks_from: zones
+
+    - name: Config interfaces
+      ansible.builtin.import_role:
+        name: dsu.ccdc.palo
+        tasks_from: interfaces
+
 
     # Firewall rules
     - name: Add CCDC local firewall rules
       ansible.builtin.import_role:
         name: dsu.ccdc.palo
         tasks_from: palo_local
-    - name: Add CCDC service firewall rules
-      ansible.builtin.import_role:
+
+    - name: Add service rules
+      when: service.key not in fw_block
+      ansible.builtin.include_role: 
         name: dsu.ccdc.palo
         tasks_from: palo_service
+      loop: "{{ services.palo | dict2items }}"
+      loop_control:
+        loop_var: service
+
+
   handlers:
     - name: Wait for System Information
       paloaltonetworks.panos.panos_op:

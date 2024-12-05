@@ -2,7 +2,7 @@
 - name: Palo initial config
   hosts: palo
   connection: local
-  ignore_errors: true
+  # ignore_errors: true
   roles:
     - dsu.ccdc.palo
   vars:
@@ -10,13 +10,13 @@
       ip_address: "{{ inventory_hostname }}"
       api_key: "{{ api_key }}"
 
-    palo_config_initial_interface: true
-    palo_config_initial_zones: true
-    palo_config_initial_rules: true
-    palo_config_logging: true
-    palo_config_initial_groups: true
-    palo_update_other: false
-    palo_update_os: false
+    # palo_config_initial_interface: true
+    # palo_config_initial_zones: true
+    # palo_config_initial_rules: true
+    # palo_config_logging: true
+    # palo_config_initial_groups: true
+    # palo_update_other: false
+    # palo_update_os: false
 
   tasks:
     - name: Include role
@@ -94,12 +94,23 @@
       ansible.builtin.import_role:
         name: dsu.ccdc.palo
         tasks_from: zones
+    - name: Set initial zones complete
+      ansible.builtin.set_fact:
+        palo_config_initial_zones: false
+        cacheable: true
+      when: palo_config_initial_zones
 
     # Interfaces
     - name: Add interfaces
       ansible.builtin.import_role:
         name: dsu.ccdc.palo
         tasks_from: interfaces
+      when: palo_config_initial_interface
+
+    - name: Set initial interface complete
+      ansible.builtin.set_fact:
+        palo_config_initial_interface: false
+        cacheable: true
       when: palo_config_initial_interface
 
     # Objects

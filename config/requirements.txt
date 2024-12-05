@@ -1,4 +1,4 @@
-ansible==10.6.0
+ansible==11.1.0
 cffi==1.17.1
 cryptography==41.0.7
 git+https://github.com/vmware/vsphere-automation-sdk-python.git ; python_version >= '2.7' 
@@ -11,6 +11,5 @@ pycparser==2.22
 pyOpenSSL==23.3.0
 pyVmomi==8.0.3.0.1
 requests==2.32.3
-setuptools==75.6.0
 urllib3==2.2.3
 xmltodict==0.12.0
