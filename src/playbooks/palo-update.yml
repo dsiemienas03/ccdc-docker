@@ -1,0 +1,36 @@
+---
+- name: Palo initial config
+  hosts: palo
+  connection: local
+  # ignore_errors: true
+  roles:
+    - dsu.ccdc.palo
+  vars:
+    provider:
+      ip_address: "{{ inventory_hostname }}"
+      api_key: "{{ api_key }}"
+
+  tasks:
+    - name: Include role
+      ansible.builtin.include_role:
+        name: dsu.ccdc.palo
+        vars_from: main
+
+    - name: Load vars
+      ansible.builtin.include_vars:
+        dir: /home/ansible/data/vars/
+
+    - name: Palo update content
+      ansible.builtin.import_role:
+        name: dsu.ccdc.palo
+        tasks_from: content_update
+
+    - name: Palo update wildfire
+      ansible.builtin.import_role:
+        name: dsu.ccdc.palo
+        tasks_from: wildfire_update
+
+    - name: Palo update AV
+      ansible.builtin.import_role:
+        name: dsu.ccdc.palo
+        tasks_from: av_update

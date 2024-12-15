@@ -1,0 +1,35 @@
+---
+- name: Palo initial config
+  hosts: palo
+  connection: local
+  gather_facts: true
+  # ignore_errors: true
+  roles:
+    - dsu.ccdc.palo
+  vars:
+    provider:
+      ip_address: "{{ inventory_hostname }}"
+      api_key: "{{ api_key }}"
+
+  tasks:
+    - name: Include role
+      ansible.builtin.include_role:
+        name: dsu.ccdc.palo
+        vars_from: main.yml
+    # - name: Show Facts
+    #   ansible.builtin.debug:
+    #     var: "{{update_os}}, {{logging}}"
+
+    - name: Load vars
+      ansible.builtin.include_vars:
+        dir: /home/ansible/data/vars/
+
+    - name: Gather info
+      paloaltonetworks.panos.panos_facts:
+        provider: "{{ provider }}"
+        gather_subset: vsys
+      register: info
+
+    - name: Print info
+      ansible.builtin.debug:
+        var: info

@@ -64,3 +64,4 @@ wrccdc_fw:
 fw_block:
   - esx
   - dc
+  - db

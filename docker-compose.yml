@@ -1,6 +1,6 @@
 services:
   ansible:
-    image: ansible
+    image: ghcr.io/dsiemienas03/ccdc-ansible:latest
     user: 1001:1001
     volumes:
       - data:/home/ansible/data

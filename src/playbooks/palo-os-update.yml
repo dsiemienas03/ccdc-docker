@@ -1,0 +1,69 @@
+---
+- name: Palo initial config
+  hosts: palo
+  connection: local
+  # ignore_errors: true
+  roles:
+    - dsu.ccdc.palo
+  vars:
+    provider:
+      ip_address: "{{ inventory_hostname }}"
+      api_key: "{{ api_key }}"
+
+  tasks:
+    - name: PAN-OS_update
+      ansible.builtin.debug:
+        msg: "{{ palo_panos_version }}"
+
+    - name: Download PAN-OS update
+      paloaltonetworks.panos.panos_software:
+        provider: "{{ provider }}"
+        version: "{{ palo_panos_version }}"
+        install: true
+        restart: true
+      register: install_result
+
+    - name: Notify Reboot Handler
+      ansible.builtin.command: echo "Wait for Device Reboot"
+      notify: reboot
+      changed_when: false
+
+    - name: Pause for Restart Checks
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Wait for Online Handler
+      ansible.builtin.meta: flush_handlers
+
+    - name: Set os_update as done
+      ansible.builtin.set_fact:
+        palo_update_os: false
+        cacheable: true
+      when: palo_update_os
+
+  handlers:
+    - name: Wait for System Information
+      paloaltonetworks.panos.panos_op:
+        provider: "{{ provider }}"
+        device_group: "{{ device_group if device_group is defined else omit }}"
+        cmd: show system info
+      register: system_info
+      until: system_info is not failed
+      retries: 100
+      delay: 10
+      listen: reboot
+
+    - name: Update System Info
+      ansible.builtin.set_fact:
+        system_info_json: "{{ system_info.stdout | from_json }}"
+      listen: reboot
+
+    - name: Update Software Version
+      ansible.builtin.set_fact:
+        sw_version: "{{ system_info_json.response.result.system['sw-version'] }}"
+      listen: reboot
+
+    - name: Display Current Software version
+      ansible.builtin.debug:
+        msg: "Current software version is: {{ sw_version }}"
+      listen: reboot
