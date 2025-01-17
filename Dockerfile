@@ -32,7 +32,7 @@ RUN set -ex ;\
 
 RUN ansible-galaxy collection install -r config/requirements.yml
 
-COPY --chown=ansible:ansible submodules/ccdc-ansible .
+ADD --chown=ansible:ansible submodules/ccdc-ansible .
 
 RUN set -ex ;\
     ansible-galaxy collection build dsu/ccdc/ ;\
