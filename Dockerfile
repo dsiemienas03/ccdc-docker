@@ -32,7 +32,7 @@ RUN set -ex ;\
 
 RUN ansible-galaxy collection install -r config/requirements.yml
 
-ADD --chown=ansible:ansible https://github.com/dsiemienas03/ccdc-ansible.git .
+ADD --chown=ansible:ansible submodules/ccdc-ansible .
 
 RUN set -ex ;\
     ansible-galaxy collection build dsu/ccdc/ ;\
