@@ -1,4 +1,4 @@
-FROM ubuntu:oracular-20241009
+FROM ubuntu:oracular-20241120
 
 # Add user
 
