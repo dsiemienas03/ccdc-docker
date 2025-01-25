@@ -2,21 +2,22 @@
 - name: Palo initial config
   hosts: palo
   connection: local
-  ignore_errors: true
+  # ignore_errors: true
   roles:
     - dsu.ccdc.palo
+  gather_facts: true
   vars:
     provider:
       ip_address: "{{ inventory_hostname }}"
       api_key: "{{ api_key }}"
 
-    palo_config_initial_interface: true
-    palo_config_initial_zones: true
+    # palo_config_initial_interface: true
+    # palo_config_initial_zones: true
     palo_config_initial_rules: true
-    palo_config_logging: true
-    palo_config_initial_groups: true
-    palo_update_other: false
-    palo_update_os: false
+    # palo_config_logging: true
+    # palo_config_initial_groups: true
+    # palo_update_other: false
+    # palo_update_os: true
 
   tasks:
     - name: Include role
@@ -69,11 +70,20 @@
         dns_server_primary: "{{ local_dns }}"
         dns_server_secondary: "{{ white_dns }}"
         ntp_server_primary: "{{ white_ntp }}"
+        ntp_server_secondary: "time.cloudflare.com"
+      when: palo_config_initial_interface
 
     # Updates
+    - name: Update content
+      ansible.builtin.import_role:
+        name: dsu.ccdc.palo
+        tasks_from: content_update
+      when: palo_update_os
+
     - name: Palo OS Update
       ansible.builtin.import_role:
         name: dsu.ccdc.palo
+        # tasks_from: os_update
         tasks_from: os_update
         vars_from: main
       when: palo_update_os
@@ -93,12 +103,23 @@
       ansible.builtin.import_role:
         name: dsu.ccdc.palo
         tasks_from: zones
+    - name: Set initial zones complete
+      ansible.builtin.set_fact:
+        palo_config_initial_zones: false
+        cacheable: true
+      when: palo_config_initial_zones
 
     # Interfaces
     - name: Add interfaces
       ansible.builtin.import_role:
         name: dsu.ccdc.palo
         tasks_from: interfaces
+      when: palo_config_initial_interface
+
+    - name: Set initial interface complete
+      ansible.builtin.set_fact:
+        palo_config_initial_interface: false
+        cacheable: true
       when: palo_config_initial_interface
 
     # Objects

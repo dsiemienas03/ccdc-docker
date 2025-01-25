@@ -1,21 +1,20 @@
 FROM ubuntu:oracular-20241120
 
-# Add user
-
 RUN set -ex ;\
     apt-get update ;\
     apt-get install -y --no-install-recommends \
     apt-utils ;\
-    \
     apt-get install -y --no-install-recommends \ 
     ansible \
     git \
     python3 \
+    python3-setuptools \
     python3-pip \
     vim \
     tmux ;\
     rm -rf /var/apt/cache /var/lib/apt/lists/*
 
+# Add user
 RUN useradd ansible -ms /bin/bash
 
 WORKDIR /home/ansible
