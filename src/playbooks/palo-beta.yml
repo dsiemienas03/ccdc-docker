@@ -18,7 +18,7 @@
 
     - name: Include IP vars
       ansible.builtin.include_vars:
-        dir: ~/data/vars/
+        dir: /home/ansible/data/vars/
     # - name: Show Facts
     #   ansible.builtin.debug:
     #     var: "{{update_os}}, {{logging}}"
@@ -35,9 +35,9 @@
           Logging: "{{ palo_config_logging }}"
           Initial Rules: "{{ palo_config_initial_rules }}"
           PANOS Version: "{{ palo_panos_version }}"
-          Wazuh: "{{ wazuh }}"
-          Wazuh Port: "{{ wazuh_port }}"
-          Remote Networks: "{{ remote_net }}"
+          Wazuh: "{{ wazuh | default('0.0.0.0') }}"
+          Wazuh Port: "{{ wazuh_port | default('0') }}"
+          Remote Networks: "{{ remote_net | default('0.0.0.0') }}"
 
     - name: Tags
       ansible.builtin.import_role:
