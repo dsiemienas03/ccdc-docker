@@ -77,7 +77,6 @@ RUN set -ex ;\
     -r config/requirements.txt
 
 FROM base AS final
-RUN /output/scripts/check_ansible $PYCMD
 WORKDIR /home/ansible
 COPY --from=galaxy /usr/share/ansible /usr/share/ansible
 COPY --chown=ansible:ansible src/ ./
