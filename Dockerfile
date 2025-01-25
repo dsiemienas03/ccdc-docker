@@ -1,5 +1,5 @@
 ARG BASE_IMG="ubuntu:oracular-20241120"
-ARG PYCMD="python3"
+ARG PYCMD="/usr/bin/python3"
 ARG PKGMGR_PRESERVE_CACHE=""
 ARG ANSIBLE_GALAXY_CLI_COLLECTION_OPTS="-v"
 ARG ANSIBLE_GALAXY_CLI_ROLE_OPTS=""
@@ -19,21 +19,15 @@ RUN set -ex ;\
     \
     apt-get install -y --no-install-recommends \ 
     ansible \
-    git \
-    # python3 \
-    # python3-pip \
-    vim \
-    tmux ;\
+    python3 \
+    python3-pip ;\
+    # git \
+    # vim \
+    # tmux ;\
     rm -rf /var/apt/cache /var/lib/apt/lists/*
 
 COPY _build/scripts/ /output/scripts/
-RUN cat /output/scripts/pip_install
-RUN /output/scripts/pip_install $PYCMD
-
-
 RUN useradd ansible -ms /bin/bash
-
-
 COPY --chown=ansible:ansible config/ ./config
 
 SHELL ["/bin/bash", "-c"]
@@ -63,7 +57,7 @@ WORKDIR /build
 RUN mkdir -p /usr/share/ansible
 RUN ansible-galaxy role install $ANSIBLE_GALAXY_CLI_ROLE_OPTS -r requirements.yml -vvv --roles-path "/usr/share/ansible/roles"
 RUN ANSIBLE_GALAXY_DISABLE_GPG_VERIFY=1 ansible-galaxy collection install $ANSIBLE_GALAXY_CLI_COLLECTION_OPTS -r requirements.yml --collections-path "/usr/share/ansible/collections"
-RUN ansible-galaxy collection install build/dsu --collections-path "/usr/share/ansible/collections"
+RUN ansible-galaxy collection install /build/dsu --collections-path "/usr/share/ansible/collections"
 
 
 FROM base AS pip
@@ -83,6 +77,8 @@ RUN set -ex ;\
     -r config/requirements.txt
 
 FROM base AS final
+RUN /output/scripts/check_ansible $PYCMD
+WORKDIR /home/ansible
 COPY --from=galaxy /usr/share/ansible /usr/share/ansible
 COPY --chown=ansible:ansible src/ ./
 
