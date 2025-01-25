@@ -35,8 +35,7 @@ RUN ansible-galaxy collection install -r config/requirements.yml
 ADD --chown=ansible:ansible submodules/ccdc-ansible .
 
 RUN set -ex ;\
-    ansible-galaxy collection build dsu/ccdc/ ;\
-    ansible-galaxy collection install --offline dsu-ccdc-1.0.0.tar.gz ;\
+    ansible-galaxy collection install dsu/ ;\
     rm -rf dsu-ccdc-1.0.0.tar.gz .github .config
 
 COPY --chown=ansible:ansible src/ ./
