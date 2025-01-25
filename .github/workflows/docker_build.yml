@@ -83,7 +83,7 @@ jobs:
       # https://github.com/docker/build-push-action
       - name: Build and push Docker image
         id: build-and-push
-        uses: docker/build-push-action@v6.12.0
+        uses: docker/build-push-action@v6.13.0
         with:
           context: .
           push: true
@@ -110,7 +110,7 @@ jobs:
       
       - name: Build and push Docker image to Docker Hub
         id: build-and-push-docker
-        uses: docker/build-push-action@v6.12.0
+        uses: docker/build-push-action@v6.13.0
         with:
           context: .
           push: true
