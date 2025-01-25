@@ -1,0 +1,15 @@
+---
+collections:
+  # Palo
+  - name: paloaltonetworks.panos
+  # pfSense
+  - name: pfsensible.core
+  # - name: vbotka.freebsd_pf
+  # Cisco
+  - name: cisco.fmcansible
+  # Proxmox community.general.proxmox
+  # VMware
+  # - name: community.vmware
+  # - name: dsu.ccdc
+  #   type: dir
+  #   source: ccdc/
