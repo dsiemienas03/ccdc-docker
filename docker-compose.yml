@@ -1,6 +1,6 @@
 services:
   ansible:
-    image: ansible
+    image: ansible-test
     user: 1001:1001
     volumes:
       - data:/home/ansible/data
