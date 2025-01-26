@@ -10,10 +10,10 @@
       ip_address: "{{ inventory_hostname }}"
       api_key: "{{ api_key }}"
 
-    palo_config_initial_interface: true
-    palo_config_initial_zones: true
+    palo_config_initial_interface: false
+    # palo_config_initial_zones: true
     palo_config_initial_rules: true
-    palo_config_logging: true
+    # palo_config_logging: true
     palo_config_initial_groups: true
     palo_update_other: false
     palo_update_os: false
@@ -34,10 +34,10 @@
     - name: Print configs
       ansible.builtin.debug:
         msg:
-          Update OS: "{{ palo_update_os }}"
-          Update Other: "{{ palo_update_other }}"
-          PANOS Version: "{{ palo_panos_version }}"
-          FW Net: "{{ lan_net }}"
+          Update OS: "{{ palo_update_os | default(omit) }}"
+          Update Other: "{{ palo_update_other | default(omit) }}"
+          PANOS Version: "{{ palo_panos_version | default(omit) }}"
+          FW Net: "{{ lan_net | default(omit) }}"
           Wazuh: "{{ wazuh | default(omit) }}"
           Wazuh Port: "{{ wasuh_port | default(omit) }}"
 
@@ -45,11 +45,11 @@
       ansible.builtin.debug:
         msg:
           Phone: "{{ white_phone | default(omit) }}"
-          CCS: "{{ white_ccs }}"
-          Proxy: "{{ white_proxy }}"
-          Mask: "{{ white_mask }}"
-          NTP: "{{ white_ntp }}"
-          DNS: "{{ white_dns }}"
+          CCS: "{{ white_ccs | default(omit) }}"
+          Proxy: "{{ white_proxy | default(omit) }}"
+          Mask: "{{ white_mask | default(omit) }}"
+          NTP: "{{ white_ntp | default(omit) }}"
+          DNS: "{{ white_dns | default(omit) }}"
 
     - name: Print options
       ansible.builtin.debug:
@@ -64,6 +64,7 @@
       ansible.builtin.pause:
 
     - name: Set dns and panorama
+      when: local_dns is defined
       paloaltonetworks.panos.panos_mgtconfig:
         provider: "{{ provider }}"
         dns_server_primary: "{{ local_dns }}"
