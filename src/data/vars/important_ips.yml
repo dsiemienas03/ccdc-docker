@@ -1,6 +1,7 @@
 ---
 # Whiteteam IPs
-white_mask: 10.120.0.0/24
+white_net: 10.120.0.0/24
+white_patch: 10.120.0.9
 white_ntp: 10.120.0.10
 white_dns: 10.120.0.53
 white_ccs: 10.120.0.111
