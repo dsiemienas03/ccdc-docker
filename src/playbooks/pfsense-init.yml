@@ -13,7 +13,7 @@
 
     - name: Import vars
       ansible.builtin.include_vars:
-        dir: ~/data/vars/
+        dir: /home/ansible/vars/
 
     - name: Add Critical rules
       ansible.builtin.import_role:

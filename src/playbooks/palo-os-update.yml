@@ -1,0 +1,16 @@
+- name: Palo initial config
+  hosts: palo
+  connection: local
+  ignore_errors: true
+  roles:
+    - dsu.ccdc.palo
+  vars:
+    provider:
+      ip_address: "{{ inventory_hostname }}"
+      api_key: "{{ api_key }}"
+  tasks:
+    - name: Update PANOS
+      ansible.builtin.import_role:
+        name: dsu.ccdc.palo
+        tasks_from: install_panos_version
+      when: palo_update_os

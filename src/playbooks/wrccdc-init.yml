@@ -7,7 +7,7 @@
   tasks:
     - name: Import vars
       ansible.builtin.include_vars:
-        dir: /home/ansible/data/vars/
+        dir: /home/ansible/vars/
 
     - name: Set base FW rules
       ansible.builtin.import_role:

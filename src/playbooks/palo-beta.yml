@@ -1,4 +1,4 @@
-- name: Palo
+- name: Palo Beta
   hosts: palo
   connection: local
   ignore_errors: true
@@ -18,7 +18,7 @@
 
     - name: Include IP vars
       ansible.builtin.include_vars:
-        dir: /home/ansible/data/vars/
+        dir: /home/ansible/vars/
     # - name: Show Facts
     #   ansible.builtin.debug:
     #     var: "{{update_os}}, {{logging}}"

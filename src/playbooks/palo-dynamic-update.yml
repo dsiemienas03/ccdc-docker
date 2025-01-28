@@ -1,0 +1,20 @@
+- name: Palo dynamic updates
+  hosts: palo
+  connection: local
+  ignore_errors: true
+  roles:
+    - dsu.ccdc.palo
+  vars:
+    provider:
+      ip_address: "{{ inventory_hostname }}"
+      api_key: "{{ api_key }}"
+  tasks:
+    - name: Include role
+      ansible.builtin.include_role:
+        name: dsu.ccdc.palo
+        vars_from: main.yml
+
+    - name: Update all other software to latest version
+      ansible.builtin.import_role:
+        name: dsu.ccdc.palo
+        tasks_from: all_updates
