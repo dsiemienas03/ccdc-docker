@@ -9,12 +9,15 @@
       ip_address: "{{ inventory_hostname }}"
       api_key: "{{ api_key }}"
   tasks:
-    - name: Include role
-      ansible.builtin.include_role:
-        name: dsu.ccdc.palo
-        vars_from: main.yml
-
-    - name: Update all other software to latest version
+    - name: Import role
       ansible.builtin.import_role:
         name: dsu.ccdc.palo
         tasks_from: all_updates
+        vars_from: main.yml
+
+    - name: Results
+      ansible.builtin.debug:
+        msg:
+          - "AV Update: {{ av_update }}"
+          - "Content Update: {{ content_update }}"
+          - "Wildfire Update: {{ wildfire_update }}"

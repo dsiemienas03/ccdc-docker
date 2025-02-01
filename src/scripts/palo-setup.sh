@@ -20,7 +20,7 @@ palo:
       lan_net: 10.${team_num}.${team_num}.
       lan_mask: 10.${team_num}.${team_num}.0/24
       local_dns: ${local_dns}
-      #palo_panos_version: 11.2.0
+      #desired_version: 11.2.4
 EOF
 
 cat ~/data/inv.yml
