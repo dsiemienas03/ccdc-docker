@@ -1,7 +1,7 @@
 - name: Palo dynamic updates
   hosts: palo
   connection: local
-  ignore_errors: true
+  # ignore_errors: true
   roles:
     - dsu.ccdc.palo
   vars:
@@ -14,10 +14,3 @@
         name: dsu.ccdc.palo
         tasks_from: all_updates
         vars_from: main.yml
-
-    - name: Results
-      ansible.builtin.debug:
-        msg:
-          - "AV Update: {{ av_update }}"
-          - "Content Update: {{ content_update }}"
-          - "Wildfire Update: {{ wildfire_update }}"
