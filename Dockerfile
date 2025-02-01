@@ -9,6 +9,7 @@ RUN set -ex ;\
     \
     apt-get install -y --no-install-recommends \ 
     ansible \
+    curl \
     git \
     python3 \
     python3-pip \
