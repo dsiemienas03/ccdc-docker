@@ -101,6 +101,7 @@ jobs:
             type=raw,value=latest
             type=semver,pattern={{version}}
             type=ref,event=tag
+            type=raw,value=${{ github.event.release.tag_name }}
 
 
       # Build and push Docker image with Buildx (don't push on PR)
