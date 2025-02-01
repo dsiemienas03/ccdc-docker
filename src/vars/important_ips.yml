@@ -11,8 +11,8 @@ white_inject: 10.120.0.110
 white_chat: 10.120.0.200
 
 # Critical IPs
-# wazuh: 1.1.1.1
-# wazuh_port: 1516
+wazuh: 1.1.1.1
+wazuh_port: 1516
 # wazuh_zone: lan
 # wazuh_protocol: TCP
 
