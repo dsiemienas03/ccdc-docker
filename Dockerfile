@@ -38,4 +38,5 @@ RUN set -ex ;\
     rm -rf dsu-ccdc-1.0.0.tar.gz .github .config
 
 COPY --chown=ansible:ansible src/ ./
+
 ENTRYPOINT ["top", "-b"]
