@@ -1,7 +1,7 @@
 ---
 # Config vars
 # palo_update_os: false
-# palo_update_other: true
+# palo_config_update_other: false
 # palo_config_zones: true
 # palo_config_initial_interface: true
 # palo_config_initial_groups: true

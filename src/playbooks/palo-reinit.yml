@@ -2,7 +2,7 @@
 - name: Palo initial config
   hosts: palo
   connection: local
-  # ignore_errors: true
+  ignore_errors: true
   roles:
     - dsu.ccdc.palo
   vars:
@@ -10,19 +10,22 @@
       ip_address: "{{ inventory_hostname }}"
       api_key: "{{ api_key }}"
 
-    # palo_update_os: true
-    # palo_config_initial_interface: false
-    # palo_config_initial_zones: true
-    # palo_config_initial_rules: true
-    # palo_config_logging: true
-    # palo_config_initial_groups: true
-    # palo_config_update_other: false
+    palo_update_os: false
+    palo_config_update_other: false
+    palo_config_initial_interface: true
+    palo_config_initial_zones: true
+    palo_config_initial_rules: true
+    palo_config_logging: true
+    palo_config_initial_groups: true
 
   tasks:
     - name: Include role
       ansible.builtin.include_role:
         name: dsu.ccdc.palo
         vars_from: main.yml
+    # - name: Show Facts
+    #   ansible.builtin.debug:
+    #     var: "{{update_os}}, {{logging}}"
 
     - name: Load vars
       ansible.builtin.include_vars:
@@ -45,7 +48,6 @@
           Mask: "{{ white_mask | default(omit) }}"
           NTP: "{{ white_ntp | default(omit) }}"
           DNS: "{{ white_dns | default(omit) }}"
-          Remote Net: "{{ remote_net | default(omit) }}"
 
     - name: Print options
       ansible.builtin.debug:
@@ -55,7 +57,7 @@
           Logging: "{{ palo_config_logging }}"
           Initial Rules: "{{ palo_config_initial_rules }}"
           Initial Zones: "{{ palo_config_initial_zones }}"
-          Update Other: "{{ palo_config_update_other | default(omit) }}"
+          Update Other: "{{ palo_config_update_other }}"
           Update OS: "{{ palo_update_os }}"
 
     - name: Confirm config
@@ -74,33 +76,37 @@
       ansible.builtin.import_role:
         name: dsu.ccdc.palo
         tasks_from: os_update
+        vars_from: main
       when: palo_update_os
 
     - name: Update all other software to latest version
       ansible.builtin.import_role:
         name: dsu.ccdc.palo
         tasks_from: all_updates
-      when: palo_config_update_other
 
     - name: Set updates complete
       ansible.builtin.set_fact:
+        palo_update_os: false
         palo_config_update_other: false
         cacheable: true
-      when: palo_config_update_other
+      when: palo_update_os or palo_config_update_other
+
+    - name: Pause for update verification
+      ansible.builtin.pause:
+      when: palo_update_os or palo_config_update_other
 
     # Zones
     - name: Add Zones
       ansible.builtin.import_role:
         name: dsu.ccdc.palo
         tasks_from: zones
-      when: palo_config_initial_zones
 
     # Interfaces
     - name: Add interfaces
-      when: palo_config_initial_interface
       ansible.builtin.import_role:
         name: dsu.ccdc.palo
         tasks_from: interfaces
+      when: palo_config_initial_interface
 
     # Objects
     - name: Add addresses
@@ -139,6 +145,12 @@
         palo_config_logging: false
         cacheable: true
       when: palo_config_logging
+
+    - name: Add tags
+      ansible.builtin.import_role:
+        name: dsu.ccdc.palo
+        tasks_from: tags
+      when: palo_config_initial_rules
 
     # Firewall rules
     - name: Add CCDC firewall Rules

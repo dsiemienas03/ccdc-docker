@@ -1,35 +1,22 @@
----
-- name: Palo initial config
+- name: Palo os update
   hosts: palo
   connection: local
-  ignore_errors: true
+  ignore_errors: false
   roles:
     - dsu.ccdc.palo
   vars:
     provider:
       ip_address: "{{ inventory_hostname }}"
       api_key: "{{ api_key }}"
+    palo_update_os: true
 
   tasks:
-    - name: Include role
-      ansible.builtin.include_role:
-        name: dsu.ccdc.palo
-        vars_from: main.yml
 
-    - name: Load vars
-      ansible.builtin.include_vars:
-        dir: /home/ansible/vars/
-
-    # Firewall rules
-    - name: Add CCDC local firewall rules
+    - name: Update PANOS
       ansible.builtin.import_role:
         name: dsu.ccdc.palo
-        tasks_from: palo_local
-
-    - name: Add service rules
-      ansible.builtin.import_role:
-        name: dsu.ccdc.palo
-        tasks_from: palo_svc
+        tasks_from: os_update
+      when: palo_update_os
 
   handlers:
     - name: Wait for System Information
@@ -39,8 +26,8 @@
         cmd: show system info
       register: system_info
       until: system_info is not failed
-      retries: 100
-      delay: 10
+      retries: 200
+      delay: 2
       listen: reboot
 
     - name: Update System Info

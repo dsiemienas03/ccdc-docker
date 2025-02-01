@@ -10,13 +10,13 @@
       ip_address: "{{ inventory_hostname }}"
       api_key: "{{ api_key }}"
 
-    # palo_update_os: true
-    # palo_config_initial_interface: false
-    # palo_config_initial_zones: true
-    # palo_config_initial_rules: true
-    # palo_config_logging: true
-    # palo_config_initial_groups: true
-    # palo_config_update_other: false
+    palo_update_os: true
+    palo_config_initial_interface: true
+    palo_config_initial_zones: true
+    palo_config_initial_rules: true
+    palo_config_logging: true
+    palo_config_initial_groups: true
+    palo_config_update_other: true
 
   tasks:
     - name: Include role
