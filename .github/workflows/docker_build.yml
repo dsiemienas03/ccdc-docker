@@ -144,8 +144,8 @@ jobs:
       # with sigstore/fulcio when running outside of PRs.
       id-token: write
     outputs:
-      tags: ${{ steps.meta2.outputs.tags }}
-      labels: ${{ steps.meta2.outputs.labels }}
+      tags: ${{ steps.meta.outputs.tags }}
+      labels: ${{ steps.meta.outputs.labels }}
     needs:
       - setup
     steps:
@@ -165,7 +165,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Extract Docker metadata
-        id: meta2
+        id: meta
         uses: docker/metadata-action@v5.6.1
         with:
           images: ${{ env.IMAGE_NAME }}
@@ -179,8 +179,8 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ steps.meta2.outputs.tags }}
-          labels: ${{ steps.meta2.outputs.labels }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
