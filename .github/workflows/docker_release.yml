@@ -17,7 +17,7 @@ env:
   COMPARE_TAG: latest
 
 jobs:
-  build:
+  GH-Release:
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     permissions:
@@ -94,6 +94,17 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+
+  Dockerhub-Release:
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      # This is used to complete the identity challenge
+      # with sigstore/fulcio when running outside of PRs.
+      id-token: write
+    steps:
       - name: Extract Docker metadata
         id: meta2
         uses: docker/metadata-action@v5.6.1
