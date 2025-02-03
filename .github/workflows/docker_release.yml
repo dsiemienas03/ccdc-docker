@@ -17,8 +17,7 @@ env:
   COMPARE_TAG: latest
 
 jobs:
-  build:
-    if: github.event_name == 'release'
+  setup:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -32,13 +31,39 @@ jobs:
         with:
           submodules: "recursive"
 
-      # Install the cosign tool except on PR
-      # https://github.com/sigstore/cosign-installer
       - name: Install cosign
         if: github.event_name != 'pull_request'
         uses: sigstore/cosign-installer@v3.7.0 # v3.1.1
         with:
           cosign-release: "v2.2.4"
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.8.0 # v3.6.1
+      - name: Cache Repository
+        uses: actions/cache@v4
+        with:
+          path: ./
+          key: ${{ runner.os }}-repo-${{ github.sha }}
+
+  github-release:
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      # This is used to complete the identity challenge
+      # with sigstore/fulcio when running outside of PRs.
+      id-token: write
+    outputs:
+      tags: ${{ steps.meta.outputs.tags }}
+      labels: ${{ steps.meta.outputs.labels }}
+    needs:
+        - setup
+    steps:
+      - name: Restore Cached Repository
+        uses: actions/cache@v4
+        with:
+          path: ./
+          key: ${{ runner.os }}-repo-${{ github.sha }}
 
       # Set up BuildKit Docker container builder to be able to build
       # multi-platform images and export cache
@@ -94,8 +119,39 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+
+  dockerhub-release:
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      # This is used to complete the identity challenge
+      # with sigstore/fulcio when running outside of PRs.
+      id-token: write
+    needs: github-release
+    outputs:
+      tags: ${{ steps.meta.outputs.tags }}
+      labels: ${{ steps.meta.outputs.labels }}
+      digest: ${{ steps.build-and-push-docker.outputs.digest }}
+    steps:
+      - name: Restore Cached Repository
+        uses: actions/cache@v4
+        with:
+          path: ./
+          key: ${{ runner.os }}-repo-${{ github.sha }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.8.0 # v3.6.1
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Extract Docker metadata
-        id: meta2
+        id: meta
         uses: docker/metadata-action@v5.6.1
         with:
           images: ${{ env.IMAGE_NAME }}
@@ -118,13 +174,33 @@ jobs:
           labels: ${{ steps.meta2.outputs.labels }}
           provenance: mode=max
 
+
+  Docker-Scout:
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      # This is used to complete the identity challenge
+      # with sigstore/fulcio when running outside of PRs.
+      id-token: write
+    needs: 
+      - dockerhub-release
+      - github-release
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Docker Scout
         id: docker-scout
         if: ${{ github.event_name == 'pull_request' }}
         uses: docker/scout-action@v1
         with:
           command: cves, recommendations, sbom
-          image: ${{ steps.meta.outputs.tags }}
+          image: ${{ needs.github-release.outputs.tags }}
           ignore-unchanged: true
           only-severities: critical,high
           write-comment: true
@@ -140,8 +216,8 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}
         env:
           # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-an-intermediate-environment-variable
-          TAGS: ${{ steps.meta.outputs.tags }}
-          DIGEST: ${{ steps.build-and-push.outputs.digest }}
+          TAGS: ${{ needs.Dockerhub-Release.outputs.tags }}
+          DIGEST: ${{ needs.Dockerhub-Release.outputs.digest }}
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
@@ -151,8 +227,8 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}
         env:
           # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-an-intermediate-environment-variable
-          TAGS: ${{ steps.meta.outputs.tags }}
-          DIGEST: ${{ steps.build-and-push-docker.outputs.digest }}
+          TAGS: ${{ needs.Dockerhub-Release.outputs.tags }}
+          DIGEST: ${{ needs.Dockerhub-Release.outputs.digest }}
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
