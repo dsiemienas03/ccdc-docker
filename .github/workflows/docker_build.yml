@@ -139,7 +139,6 @@ jobs:
           tags: ${{ steps.meta2.outputs.tags }}
           labels: ${{ steps.meta2.outputs.labels }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max
           provenance: mode=max
 
   Docker-Scout:
