@@ -15,7 +15,8 @@ RUN set -ex ;\
     tmux ;\
     rm -rf /var/apt/cache /var/lib/apt/lists/*
 
-RUN useradd ansible -ms /bin/bash
+RUN userdel ubuntu
+RUN useradd ansible -u 1000 -ms /bin/bash
 
 WORKDIR /home/ansible
 USER ansible
