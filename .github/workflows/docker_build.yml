@@ -37,6 +37,7 @@ jobs:
     outputs:
       tags: ${{ steps.meta.outputs.tags }}
       labels: ${{ steps.meta.outputs.labels }}
+      image: ${{ steps.build-and-push.outputs.image }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -165,7 +166,7 @@ jobs:
         with:
           # command: cves,recommendations,compare
           command: compare
-          image: ${{ needs.build.outputs.tags }}
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.build.outputs.tags }}
           to: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.COMPARE_TAG }}
           ignore-unchanged: false
           write-comment: true
