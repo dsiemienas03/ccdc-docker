@@ -130,7 +130,8 @@ jobs:
           load: ${{ github.event_name == 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
   dockerhub-build:
     if: github.event_name != 'release'
     runs-on: ubuntu-latest
@@ -180,6 +181,8 @@ jobs:
           push: true
           tags: ${{ steps.meta2.outputs.tags }}
           labels: ${{ steps.meta2.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   docker-scout:
     if: github.event_name != 'release'
