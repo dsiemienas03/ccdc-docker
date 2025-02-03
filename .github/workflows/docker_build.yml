@@ -121,14 +121,26 @@ jobs:
           cache-to: type=gha,mode=max
           provenance: mode=max
 
-
+  Docker-Scout:
+    if: github.event_name != 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      pull-requests: write
+      security-events: write
+      # This is used to complete the identity challenge
+      # with sigstore/fulcio when running outside of PRs.
+      id-token: write
+    needs: build
+    steps:
       - name: Docker Scout
         id: docker-scout
         uses: docker/scout-action@v1
         with:
           # command: cves,recommendations,compare
           command: compare
-          image: ${{ steps.meta.outputs.tags }}
+          image: ${{ needs.build.outputs.tags }}
           to: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.COMPARE_TAG }}
           ignore-unchanged: false
           write-comment: true
