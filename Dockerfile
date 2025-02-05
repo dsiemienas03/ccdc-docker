@@ -36,4 +36,4 @@ RUN set -ex ;\
 
 COPY --chown=ansible:ansible src/ ./
 
-CMD ["top", "-b"]
+ENTRYPOINT ["top", "-b"]
