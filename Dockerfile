@@ -1,7 +1,5 @@
 FROM ubuntu:oracular-20241120
 
-# Add user
-
 RUN set -ex ;\
     apt-get update ;\
     apt-get install -y --no-install-recommends \
@@ -30,9 +28,7 @@ RUN set -ex ;\
     pip install --break-system-packages --no-cache-dir \
     -r config/requirements.txt
 
-# RUN ansible-galaxy collection install -r config/requirements.yml
-
-ADD --chown=ansible:ansible submodules/ccdc-ansible/ ./dsu
+COPY --chown=ansible:ansible submodules/ccdc-ansible/ ./dsu
 
 RUN set -ex ;\
     ansible-galaxy collection install dsu/ ;\
