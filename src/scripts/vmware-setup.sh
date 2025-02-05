@@ -15,7 +15,7 @@ cat >> data/inv.yml <<EOF
 esxi:
   hosts:
     ${esxi_host_ip}:
-      ansible_user: root
+      esxi_user: root
       esxi_password: ${esxi_host_pw}
 
 EOF

@@ -52,3 +52,13 @@ cisco_zone:
     # zone:
     # ethernet1/12:
     # zone:
+
+esxi_vswitches:
+  - net1
+  - net2
+  - net3
+  - net4
+  - net5
+  - net6
+  - net7
+  - mgt

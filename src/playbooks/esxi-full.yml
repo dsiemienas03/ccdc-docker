@@ -1,5 +1,5 @@
 ---
-- name: ESXI snapshot
+- name: ESXI full configuration
   hosts: esxi
   # ignore_errors: true
   gather_facts: false
@@ -44,3 +44,17 @@
           - name: "mgt"
       register: new_nic
       delegate_to: localhost
+
+    - name: Set new net
+      ansible.builtin.set_fact:
+        new_net: "net1"
+
+    - name: Move VMs to new vSwitch
+      ansible.builtin.import_role:
+        name: dsu.ccdc.esxi
+        tasks_from: update_nic
+
+    - name: Snapshot with new nics
+      ansible.builtin.import_role:
+        name: dsu.ccdc.esxi
+        tasks_from: snapshot

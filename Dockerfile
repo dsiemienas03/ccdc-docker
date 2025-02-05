@@ -15,8 +15,7 @@ RUN set -ex ;\
     tmux ;\
     rm -rf /var/apt/cache /var/lib/apt/lists/*
 
-RUN userdel ubuntu
-RUN useradd ansible -u 1000 -ms /bin/bash
+RUN useradd ansible -ms /bin/bash
 
 WORKDIR /home/ansible
 USER ansible
@@ -37,4 +36,4 @@ RUN set -ex ;\
 
 COPY --chown=ansible:ansible src/ ./
 
-ENTRYPOINT ["top", "-b"]
+CMD ["top", "-b"]
