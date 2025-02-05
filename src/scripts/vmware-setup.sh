@@ -1,6 +1,7 @@
 #!/usr/bin/env bash 
 read -p "ESXi Host IP: " esxi_host_ip
 read -p "ESXi Host Password: " esxi_host_pw
+read -p "Firewall Name: " fw_name
 
 
 
@@ -17,6 +18,7 @@ esxi:
     ${esxi_host_ip}:
       esxi_user: root
       esxi_password: ${esxi_host_pw}
+      fw_name: ${fw_name}
 
 EOF
 
