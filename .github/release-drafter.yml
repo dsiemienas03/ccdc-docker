@@ -39,7 +39,7 @@ version-resolver:
 template: |
   ## Download
   ```bash
-  docker pull ghcr.io/dsiemienas03/ccdc-ansible:$tag
+  docker pull ghcr.io/dsiemienas03/ccdc-ansible:${{ env.version }}
   ```
 
   ## Changes
