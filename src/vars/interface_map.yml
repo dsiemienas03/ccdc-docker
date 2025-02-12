@@ -55,10 +55,10 @@ cisco_zone:
 
 esxi_vswitches:
   - lan
-  - lan2
   - lan3
   - lan4
   - lan5
   - lan6
   - lan7
+  - lan8
   - mgt
