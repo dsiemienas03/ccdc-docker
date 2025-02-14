@@ -138,6 +138,7 @@ jobs:
           tags: |
             type=raw,value=latest
             type=semver,value=${{ env.version }}
+            type=raw,value=${{ env.version }}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
@@ -198,7 +199,7 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,value=${{ env.version }}
             type=ref,event=tag
-            type=raw,value=${{ github.event.release.tag_name }}
+            type=raw,value=${{ env.version }}
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
