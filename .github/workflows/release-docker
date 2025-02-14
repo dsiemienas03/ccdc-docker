@@ -56,7 +56,6 @@ jobs:
       labels: ${{ steps.meta.outputs.labels }}
     needs:
       - docker-setup
-      - publish_release
     steps:
       - name: Restore Cached Repository
         uses: actions/cache@v4.2.0
@@ -124,7 +123,6 @@ jobs:
       id-token: write
     needs: 
       - docker-setup
-      - publish_release
     outputs:
       tags: ${{ steps.meta.outputs.tags }}
       labels: ${{ steps.meta.outputs.labels }}
