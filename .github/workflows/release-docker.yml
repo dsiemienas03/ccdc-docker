@@ -1,12 +1,13 @@
 name: Docker Release
 
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
 on:
   release:
     types: [published, prereleased, released]
-  push:
-    tags:
-      - '*.*/*'
-
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
@@ -16,7 +17,7 @@ env:
   COMPARE_TAG: latest
 
 jobs:
-  docker-setup:
+  setup:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -31,6 +32,7 @@ jobs:
           submodules: "recursive"
 
       - name: Install cosign
+        if: github.event_name != 'pull_request'
         uses: sigstore/cosign-installer@v3.8.0 # v3.1.1
         with:
           cosign-release: "v2.2.4"
@@ -43,6 +45,7 @@ jobs:
           key: ${{ runner.os }}-repo-${{ github.sha }}
 
   github-release:
+    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -54,7 +57,7 @@ jobs:
       tags: ${{ steps.meta.outputs.tags }}
       labels: ${{ steps.meta.outputs.labels }}
     needs:
-      - docker-setup
+      - setup
     steps:
       - name: Restore Cached Repository
         uses: actions/cache@v4.2.0
@@ -72,6 +75,7 @@ jobs:
       # https://github.com/docker/login-action
       - name: Log into registry ${{ env.REGISTRY }}
         uses: docker/login-action@v3.0.0 # v3.0.0
+        if: ${{ github.event_name != 'pull_request' }}
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -79,6 +83,7 @@ jobs:
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3.0.0
+        if: ${{ github.event_name != 'pull_request' }}
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -100,20 +105,22 @@ jobs:
             type=semver,pattern={{major}}
             type=ref,event=branch
             type=ref,event=tag
-            type=raw,value=${{ github.event.release.tag_name }}
+            type=ref,event=pr
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
 
       - name: Build and push Docker image
         id: build-and-push
+        if: ${{ github.event_name != 'pull_request' }}
         uses: docker/build-push-action@ca877d9245402d1537745e0e356eab47c3520991 # v6.9.0
         with:
           context: .
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
   dockerhub-release:
+    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -121,8 +128,7 @@ jobs:
       # This is used to complete the identity challenge
       # with sigstore/fulcio when running outside of PRs.
       id-token: write
-    needs: 
-      - docker-setup
+    needs: github-release
     outputs:
       tags: ${{ steps.meta.outputs.tags }}
       labels: ${{ steps.meta.outputs.labels }}
@@ -161,12 +167,13 @@ jobs:
         uses: docker/build-push-action@v6.13.0
         with:
           context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta2.outputs.tags }}
+          labels: ${{ steps.meta2.outputs.labels }}
           provenance: mode=max
 
   Docker-Scout:
+    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -186,6 +193,7 @@ jobs:
 
       - name: Docker Scout
         id: docker-scout
+        if: ${{ github.event_name == 'pull_request' }}
         uses: docker/scout-action@v1.16.1
         with:
           command: cves, recommendations, sbom
@@ -200,19 +208,9 @@ jobs:
       # repository is public to avoid leaking data.  If you would like to publish
       # transparency data even for private images, pass --force to cosign below.
       # https://github.com/sigstore/cosign
-  Sign-Release:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      # This is used to complete the identity challenge
-      # with sigstore/fulcio when running outside of PRs.
-      id-token: write
-    needs:
-      - dockerhub-release
-      - github-release
-    steps:          
+
       - name: Sign the published Docker image
+        if: ${{ github.event_name != 'pull_request' }}
         env:
           # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-an-intermediate-environment-variable
           TAGS: ${{ needs.Dockerhub-Release.outputs.tags }}
@@ -222,6 +220,7 @@ jobs:
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
 
       - name: Sign the published Docker image on Docker hub
+        if: ${{ github.event_name != 'pull_request' }}
         env:
           # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-an-intermediate-environment-variable
           TAGS: ${{ needs.Dockerhub-Release.outputs.tags }}
