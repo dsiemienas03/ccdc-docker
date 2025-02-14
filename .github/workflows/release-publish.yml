@@ -28,6 +28,7 @@ env:
 
 jobs:
   publish_release:
+    id: publish_release
     runs-on: ubuntu-latest
     outputs: 
       version: ${{ steps.get_version.outputs.version }}
@@ -94,6 +95,7 @@ jobs:
       labels: ${{ steps.meta.outputs.labels }}
     needs:
       - docker-setup
+      - publish_release
     steps:
       - name: Restore Cached Repository
         uses: actions/cache@v4.2.0
@@ -159,7 +161,9 @@ jobs:
       # This is used to complete the identity challenge
       # with sigstore/fulcio when running outside of PRs.
       id-token: write
-    needs: docker-setup
+    needs: 
+      - docker-setup
+      - publish_release
     outputs:
       tags: ${{ steps.meta.outputs.tags }}
       labels: ${{ steps.meta.outputs.labels }}
