@@ -29,6 +29,8 @@ env:
 jobs:
   publish_release:
     runs-on: ubuntu-latest
+    outputs: 
+      version: ${{ steps.get_version.outputs.version }}
     steps:
       - uses: actions/checkout@v4.2.2
         with:
@@ -145,7 +147,7 @@ jobs:
         uses: docker/build-push-action@ca877d9245402d1537745e0e356eab47c3520991 # v6.9.0
         with:
           context: .
-          push: ${{ github.event_name != 'pull_request' }}
+          push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
@@ -196,7 +198,7 @@ jobs:
         uses: docker/build-push-action@v6.13.0
         with:
           context: .
-          push: ${{ github.event_name != 'pull_request' }}
+          push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           provenance: mode=max
