@@ -3,6 +3,9 @@ name: Docker Release
 on:
   release:
     types: [published, prereleased, released]
+  push:
+    tags:
+      - **
 
 env:
   # Use docker.io for Docker Hub if empty
