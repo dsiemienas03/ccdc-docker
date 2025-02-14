@@ -3,9 +3,9 @@ name: Docker Release
 on:
   release:
     types: [prereleased, released]
-  # push:
-  #   tags: 
-  #     - "*.*.*"
+  push:
+    tags:
+      - "*.*.*"
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
@@ -199,7 +199,18 @@ jobs:
       # repository is public to avoid leaking data.  If you would like to publish
       # transparency data even for private images, pass --force to cosign below.
       # https://github.com/sigstore/cosign
-
+  Sign-Release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      # This is used to complete the identity challenge
+      # with sigstore/fulcio when running outside of PRs.
+      id-token: write
+    needs:
+      - dockerhub-release
+      - github-release
+    steps:          
       - name: Sign the published Docker image
         env:
           # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-an-intermediate-environment-variable
