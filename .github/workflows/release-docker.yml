@@ -2,10 +2,8 @@ name: Docker Release
 
 on:
   release:
-    types: [prereleased, released]
-  push:
-    tags:
-      - "*.*.*"
+    types: [published, prereleased, released]
+
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
