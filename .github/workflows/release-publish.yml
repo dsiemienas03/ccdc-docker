@@ -28,7 +28,6 @@ env:
 
 jobs:
   publish_release:
-    id: publish_release
     runs-on: ubuntu-latest
     outputs: 
       version: ${{ steps.get_version.outputs.version }}
