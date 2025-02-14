@@ -191,7 +191,7 @@ jobs:
 
       - name: Docker Scout
         id: docker-scout
-        uses: docker/scout-action@v1.16.1
+        uses: docker/scout-action@v1
         with:
           command: cves, recommendations, sbom
           image: ${{ needs.github-release.outputs.tags }}
