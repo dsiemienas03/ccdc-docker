@@ -7,7 +7,7 @@ name: Docker Release
 
 on:
   release:
-    types: [published, prereleased, released]
+    types: [published]
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
@@ -93,7 +93,7 @@ jobs:
 
       - name: Extract Docker metadata
         id: meta
-        uses: docker/metadata-action@369eb591f429131d6889c46b94e711f089e6ca96 # v5.6.1
+        uses: docker/metadata-action@v5.6.1 # v5.6.1
         with:
           images: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
@@ -103,16 +103,14 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
-            type=ref,event=branch
             type=ref,event=tag
-            type=ref,event=pr
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
 
       - name: Build and push Docker image
         id: build-and-push
         if: ${{ github.event_name != 'pull_request' }}
-        uses: docker/build-push-action@ca877d9245402d1537745e0e356eab47c3520991 # v6.9.0
+        uses: docker/build-push-action@v6.9.0 # v6.9.0
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
@@ -128,7 +126,7 @@ jobs:
       # This is used to complete the identity challenge
       # with sigstore/fulcio when running outside of PRs.
       id-token: write
-    needs: github-release
+    needs: setup
     outputs:
       tags: ${{ steps.meta.outputs.tags }}
       labels: ${{ steps.meta.outputs.labels }}
@@ -168,8 +166,8 @@ jobs:
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta2.outputs.tags }}
-          labels: ${{ steps.meta2.outputs.labels }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           provenance: mode=max
 
   Docker-Scout:
@@ -193,8 +191,7 @@ jobs:
 
       - name: Docker Scout
         id: docker-scout
-        if: ${{ github.event_name == 'pull_request' }}
-        uses: docker/scout-action@v1.16.1
+        uses: docker/scout-action@v1
         with:
           command: cves, recommendations, sbom
           image: ${{ needs.github-release.outputs.tags }}
