@@ -139,10 +139,10 @@ jobs:
         with:
           images: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          # ${{ env.REGISTRY2 }}/${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=latest
             type=raw,value=${{ steps.get_version.outputs.version }}
+            type=semver,value=${{ steps.get_version.outputs.version }}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
@@ -205,6 +205,7 @@ jobs:
             type=semver,pattern={{version}}
             type=ref,event=tag
             type=raw,value=${{ steps.get_version.outputs.version }}
+            type=semver,value=${{ steps.get_version.outputs.version }}
 
 
       # Build and push Docker image with Buildx (don't push on PR)
