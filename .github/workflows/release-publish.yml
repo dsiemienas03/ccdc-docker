@@ -38,10 +38,7 @@ jobs:
       - name: Get version
         id: get_version
         run: echo "version=$(cat VERSION)" >> $GITHUB_ENV
-      # (Optional) GitHub Enterprise requires GHE_HOST variable set
-      # - name: Set GHE_HOST
-      #  run: |
-      #    echo "GHE_HOST=${GITHUB_SERVER_URL##https:\/\/}" >> $GITHUB_ENV
+
 
       # Drafts your next Release notes as Pull Requests are merged into "master"
       - uses: release-drafter/release-drafter@v6.1.0
@@ -91,7 +88,8 @@ jobs:
       # This is used to complete the identity challenge
       # with sigstore/fulcio when running outside of PRs.
       id-token: write
-
+    # env:
+    #   VERSION: ${{ needs.publish_release.outputs.version }}
     outputs:
       tags: ${{ steps.meta.outputs.tags }}
       labels: ${{ steps.meta.outputs.labels }}
@@ -107,7 +105,7 @@ jobs:
 
       - name: Get version
         id: get_version
-        run: echo "version=$(cat VERSION)" >> $GITHUB_ENV
+        run: echo "VERSION=$(cat VERSION)" >> $GITHUB_ENV
 
       # Set up BuildKit Docker container builder to be able to build
       # multi-platform images and export cache
@@ -142,7 +140,7 @@ jobs:
           tags: |
             type=raw,value=latest
             type=raw,value=${{ steps.get_version.outputs.version }}
-            type=semver,value=${{ steps.get_version.outputs.version }}
+            type=raw,value=${{ env.VERSION }}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
@@ -166,8 +164,8 @@ jobs:
       # This is used to complete the identity challenge
       # with sigstore/fulcio when running outside of PRs.
       id-token: write
-    env:
-      VERSION: ${{ needs.publish_release.outputs.version }}
+    # env:
+    #   VERSION: ${{ needs.publish_release.outputs.version }}
     needs:
       - docker-setup
       - publish_release
@@ -184,7 +182,7 @@ jobs:
 
       - name: Get version
         id: get_version
-        run: echo "version=$(cat VERSION)" >> $GITHUB_ENV
+        run: echo "VERSION=$(cat VERSION)" >> $GITHUB_ENV
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.10.0 # v3.6.1
@@ -204,8 +202,10 @@ jobs:
             type=raw,value=latest
             type=semver,pattern={{version}}
             type=ref,event=tag
-            type=raw,value=${{ steps.get_version.outputs.version }}
-            type=semver,value=${{ steps.get_version.outputs.version }}
+            type=pep440,pattern={{version}}
+            type=raw,value=${{ needs.publish_release.outputs.version }}
+            type=semver,value=${{ env.VERSION }}
+
 
 
       # Build and push Docker image with Buildx (don't push on PR)
