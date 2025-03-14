@@ -243,7 +243,7 @@ jobs:
           command: cves, recommendations, sbom
           image: ${{ needs.github-release.outputs.tags }}
           ignore-unchanged: true
-          only-severities: critical,high
+          only-severities: critical,high,medium,low
           write-comment: true
           github-token: ${{ secrets.GITHUB_TOKEN }} # to be able to write the comment
 
