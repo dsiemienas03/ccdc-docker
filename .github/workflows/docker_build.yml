@@ -45,7 +45,7 @@ jobs:
           cosign-release: "v2.2.4"
 
       - name: Cache Repository
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@v4.2.3
         with:
           path: ./
           key: ${{ runner.os }}-repo-${{ github.sha }}
@@ -90,7 +90,7 @@ jobs:
       # Login against a Docker registry except on PR
       # https://github.com/docker/login-action
       - name: Restore Cached Repository
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@v4.2.3
         with:
           path: ./
           key: ${{ runner.os }}-repo-${{ github.sha }}
@@ -150,7 +150,7 @@ jobs:
       - setup
     steps:
       - name: Restore Cached Repository
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@v4.2.3
         with:
           path: ./
           key: ${{ runner.os }}-repo-${{ github.sha }}
