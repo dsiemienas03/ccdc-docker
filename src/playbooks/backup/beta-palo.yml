@@ -2,7 +2,7 @@
 - name: Palo initial config
   hosts: palo
   connection: local
-  ignore_errors: true
+  # ignore_errors: true
   roles:
     - dsu.ccdc.palo
   vars:
@@ -10,36 +10,42 @@
       ip_address: "{{ inventory_hostname }}"
       api_key: "{{ api_key }}"
 
+    palo_update_os: true
     palo_config_initial_interface: true
     palo_config_initial_zones: true
     palo_config_initial_rules: true
     palo_config_logging: true
     palo_config_initial_groups: true
-    palo_update_other: true
-    palo_update_os: false
+    palo_config_update_other: true
 
   tasks:
     - name: Include role
       ansible.builtin.include_role:
         name: dsu.ccdc.palo
         vars_from: main.yml
-    # - name: Show Facts
-    #   ansible.builtin.debug:
-    #     var: "{{update_os}}, {{logging}}"
 
     - name: Load vars
       ansible.builtin.include_vars:
-        dir: ~/data/vars/
+        dir: /home/ansible/vars/
 
     - name: Print configs
       ansible.builtin.debug:
         msg:
-          Update OS: "{{ palo_update_os }}"
-          Update Other: "{{ palo_update_other }}"
-          PANOS Version: "{{ palo_panos_version }}"
-          FW Net: "{{ fw_mask }}"
-          Wazuh: "{{ wazuh }}"
-          Wazuh Port: "{{ wazuh_port }}"
+          PANOS Version: "{{ palo_panos_version | default(omit) }}"
+          FW Net: "{{ lan_net | default(omit) }}"
+          Wazuh: "{{ wazuh | default(omit) }}"
+          Wazuh Port: "{{ wasuh_port | default(omit) }}"
+
+    - name: Print Important IPs
+      ansible.builtin.debug:
+        msg:
+          Phone: "{{ white_phone | default(omit) }}"
+          CCS: "{{ white_ccs | default(omit) }}"
+          Proxy: "{{ white_proxy | default(omit) }}"
+          Mask: "{{ white_mask | default(omit) }}"
+          NTP: "{{ white_ntp | default(omit) }}"
+          DNS: "{{ white_dns | default(omit) }}"
+          Remote Net: "{{ remote_net | default(omit) }}"
 
     - name: Print options
       ansible.builtin.debug:
@@ -49,39 +55,52 @@
           Logging: "{{ palo_config_logging }}"
           Initial Rules: "{{ palo_config_initial_rules }}"
           Initial Zones: "{{ palo_config_initial_zones }}"
+          Update Other: "{{ palo_config_update_other | default(omit) }}"
+          Update OS: "{{ palo_update_os }}"
+
     - name: Confirm config
       ansible.builtin.pause:
+
+    - name: Set dns and panorama
+      when: local_dns is defined
+      paloaltonetworks.panos.panos_mgtconfig:
+        provider: "{{ provider }}"
+        dns_server_primary: "{{ local_dns }}"
+        dns_server_secondary: "{{ white_dns }}"
+        ntp_server_primary: "{{ white_ntp }}"
 
     # Updates
     - name: Palo OS Update
       ansible.builtin.import_role:
         name: dsu.ccdc.palo
         tasks_from: os_update
-        vars_from: main
       when: palo_update_os
 
     - name: Update all other software to latest version
       ansible.builtin.import_role:
         name: dsu.ccdc.palo
         tasks_from: all_updates
-      when: palo_update_other
+      when: palo_config_update_other
 
-    - name: Pause for update verification
-      ansible.builtin.pause:
-      when: palo_update_os or palo_update_other
+    - name: Set updates complete
+      ansible.builtin.set_fact:
+        palo_config_update_other: false
+        cacheable: true
+      when: palo_config_update_other
 
     # Zones
     - name: Add Zones
       ansible.builtin.import_role:
         name: dsu.ccdc.palo
         tasks_from: zones
+      when: palo_config_initial_zones
 
     # Interfaces
     - name: Add interfaces
+      when: palo_config_initial_interface
       ansible.builtin.import_role:
         name: dsu.ccdc.palo
         tasks_from: interfaces
-      when: palo_config_initial_interface
 
     # Objects
     - name: Add addresses
@@ -121,12 +140,6 @@
         cacheable: true
       when: palo_config_logging
 
-    - name: Add tags
-      ansible.builtin.import_role:
-        name: dsu.ccdc.palo
-        tasks_from: tags
-      when: palo_config_initial_rules
-
     # Firewall rules
     - name: Add CCDC firewall Rules
       ansible.builtin.import_role:
@@ -142,6 +155,7 @@
     - name: Wait for System Information
       paloaltonetworks.panos.panos_op:
         provider: "{{ provider }}"
+        device_group: "{{ device_group if device_group is defined else omit }}"
         cmd: show system info
       register: system_info
       until: system_info is not failed

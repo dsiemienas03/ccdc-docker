@@ -1,9 +1,8 @@
 #!/usr/bin/env bash 
-read -p "Palo IP: " palo_ip
-read -p "Palo PW: " palo_pw
-read -p "Cisco FTD IP: " ftd_ip
-read -p "Cisco FMC IP: " fmc_ip
-read -p "Cisco PW: " cisco_pw
+read -p "ESXi Host IP: " esxi_host_ip
+read -p "ESXi Host Password: " esxi_host_pw
+read -p "Firewall Name: " fw_name
+
 
 
 # ssh-keygen -t rsa -b 4096 -C "ansible@localhost" -f ~/.ssh/id_rsa -N ""
@@ -16,17 +15,13 @@ api_key=$(curl -s -k -H "Content-Type: application/x-www-form-urlencoded" -X POS
 cat >> data/inv.yml <<EOF
 esxi:
   hosts:
-    10.60.60.20:
-      esxi_password: {{ ADD PASSWORD HERE }}
-    10.60.60.21:
-      esxi_password: {{ ADD PASSWORD HERE }}
-  vars:
-    ansible_user: root
-    esxi_password: {{ ADD PASSWORD HERE }}
+    ${esxi_host_ip}:
+      esxi_user: root
+      esxi_password: ${esxi_host_pw}
+      fw_name: ${fw_name}
 
 EOF
 
-cat ~/.ssh/id_rsa.pub
-cat data/inv.yml
+cat ~/data/inv.yml
 
 # sudo ansible-vault encrypt inv.yml

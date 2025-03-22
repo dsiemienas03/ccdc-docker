@@ -1,6 +1,4 @@
-FROM ubuntu:oracular-20241009
-
-# Add user
+FROM ubuntu:noble-20250127
 
 RUN set -ex ;\
     apt-get update ;\
@@ -15,22 +13,12 @@ RUN set -ex ;\
     python3-pip \
     vim \
     tmux ;\
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/apt/cache /var/lib/apt/lists/*
 
 RUN useradd ansible -ms /bin/bash
 
 WORKDIR /home/ansible
 USER ansible
-RUN set -ex ;\
-    mkdir config ;\
-    mkdir data ;\
-    mkdir dsu ;\
-    mkdir playbooks ;\
-    mkdir .ssh ;\
-    chmod 700 data ;\
-    chmod 700 .ssh ;\
-    chown ansible:ansible data ;\
-    chown ansible:ansible .ssh
 
 COPY --chown=ansible:ansible config/ ./config
 
@@ -40,14 +28,12 @@ RUN set -ex ;\
     pip install --break-system-packages --no-cache-dir \
     -r config/requirements.txt
 
-RUN ansible-galaxy collection install -r config/requirements.yml
-
-COPY --chown=ansible:ansible dsu/ ./dsu/
+COPY --chown=ansible:ansible submodules/ccdc-ansible/ ./dsu
 
 RUN set -ex ;\
-    ansible-galaxy collection build dsu/ccdc/ ;\
-    ansible-galaxy collection install --offline dsu-ccdc-1.0.0.tar.gz ;\
-    rm -rf dsu-ccdc-1.0.0.tar.gz
+    ansible-galaxy collection install dsu/ ;\
+    rm -rf .config
 
 COPY --chown=ansible:ansible src/ ./
+
 ENTRYPOINT ["top", "-b"]

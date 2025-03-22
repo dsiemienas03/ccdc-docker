@@ -3,10 +3,11 @@
   hosts: wrccdc_fw
   # connection: local
   ignore_errors: true
+  gather_facts: false
   tasks:
     - name: Import vars
       ansible.builtin.include_vars:
-        dir: ~/data/vars/
+        dir: /home/ansible/vars/
 
     - name: Set base FW rules
       ansible.builtin.import_role:
@@ -20,3 +21,17 @@
       loop: "{{ services.wrccdc_fw | dict2items }}"
       loop_control:
         loop_var: service
+
+    - name: Block services
+      when: services.wr_block is defined
+      ansible.builtin.include_role:
+        name: dsu.ccdc.wasabi_wall
+        tasks_from: wasabi_block
+      loop: "{{ services.wr_block | dict2items }}"
+      loop_control:
+        loop_var: service
+
+    - name: Set base FW rules
+      ansible.builtin.import_role:
+        name: dsu.ccdc.wasabi_wall
+        tasks_from: wasabi_base
