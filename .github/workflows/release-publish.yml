@@ -75,7 +75,7 @@ jobs:
         uses: docker/setup-buildx-action@v3.10.0
 
       - name: Cache Repository
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@v4.2.3
         with:
           path: ./
           key: ${{ runner.os }}-repo-${{ github.sha }}
@@ -98,7 +98,7 @@ jobs:
       - publish_release
     steps:
       - name: Restore Cached Repository
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@v4.2.3
         with:
           path: ./
           key: ${{ runner.os }}-repo-${{ github.sha }}
@@ -116,14 +116,14 @@ jobs:
       # Login against a Docker registry except on PR
       # https://github.com/docker/login-action
       - name: Log into registry ${{ env.REGISTRY }}
-        uses: docker/login-action@v3.0.0 # v3.0.0
+        uses: docker/login-action@v3.4.0 # v3.0.0
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v3.0.0
+        uses: docker/login-action@v3.4.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -174,7 +174,7 @@ jobs:
       digest: ${{ steps.build-and-push-docker.outputs.digest }}
     steps:
       - name: Restore Cached Repository
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@v4.2.3
         with:
           path: ./
           key: ${{ runner.os }}-repo-${{ github.sha }}
@@ -187,7 +187,7 @@ jobs:
         uses: docker/setup-buildx-action@v3.10.0 # v3.6.1
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v3.0.0
+        uses: docker/login-action@v3.4.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -250,31 +250,31 @@ jobs:
 
 
 
-  Docker-Scout:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      # This is used to complete the identity challenge
-      # with sigstore/fulcio when running outside of PRs.
-      id-token: write
-    needs:
-      - dockerhub-release
-      - github-release
-    steps:
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+  # Docker-Scout:
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: read
+  #     packages: write
+  #     # This is used to complete the identity challenge
+  #     # with sigstore/fulcio when running outside of PRs.
+  #     id-token: write
+  #   needs:
+  #     - dockerhub-release
+  #     - github-release
+  #   steps:
+  #     - name: Login to Docker Hub
+  #       uses: docker/login-action@v3
+  #       with:
+  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
+  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Docker Scout
-        id: docker-scout
-        uses: docker/scout-action@v1.16.1
-        with:
-          command: cves, recommendations, sbom
-          image: ${{ needs.github-release.outputs.tags }}
-          ignore-unchanged: true
-          only-severities: critical,high,medium,low
-          write-comment: true
-          github-token: ${{ secrets.GITHUB_TOKEN }} # to be able to write the comment
+  #     - name: Docker Scout
+  #       id: docker-scout
+  #       uses: docker/scout-action@v1.16.1
+  #       with:
+  #         command: cves, recommendations, sbom
+  #         image: ${{ needs.github-release.outputs.tags }}
+  #         ignore-unchanged: true
+  #         only-severities: critical,high,medium,low
+  #         write-comment: true
+  #         github-token: ${{ secrets.GITHUB_TOKEN }} # to be able to write the comment
