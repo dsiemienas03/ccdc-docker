@@ -1,4 +1,4 @@
-FROM ubuntu:oracular-20241120
+FROM ubuntu:noble-20250127
 
 RUN set -ex ;\
     apt-get update ;\
